@@ -1,12 +1,17 @@
 package br.com.fiap.fintechClasses;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Conta {
 
 	int Codigo;
 	String NomeConta;
 	double SaldoConta;
 	String TipoConta;
-	Categoria Categoria;
 
 	public int getCodigo() {
 		return Codigo;
@@ -40,40 +45,70 @@ public class Conta {
 		this.TipoConta = TipoConta;
 	}
 
-	public Categoria getCategoria() {
-		return Categoria;
-	}
-
-	public void setCategoria(Categoria Categoria) {
-		this.Categoria = Categoria;
-	}
-
 
 	public boolean AdicionaConta(Conta Conta){
 		try {
 			this.NomeConta = Conta.NomeConta;
 			this.SaldoConta = Conta.SaldoConta;
 			this.TipoConta = Conta.TipoConta;
-			this.Categoria = Conta.Categoria;
 
-			// ADICIONA OS DADOS DA CONTA COM BASE NOS DADOS ENVIADOS COMO PARÂMETRO
+			Class.forName("oracle.jdbc.driver.OracleDriver");
 
-			return true;
+			Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
+
+			PreparedStatement stmt = Conexao.prepareStatement("INSERT INTO RM93162.USUARIO(FK_ID_USUARIO, NOME_CONTA, SALDO_CONTA, TIPO_CONTA) VALUES(?, ?, ?, ?)");
+
+			stmt.setInt(1, 1);
+			stmt.setString(2, this.NomeConta);
+			stmt.setDouble(3, this.SaldoConta);
+			stmt.setString(4, this.TipoConta);
+			
+			stmt.executeQuery();
 		}
-		catch(Exception e) {
+
+		catch(SQLException e) {
+			System.err.println("Não foi possível conectar ao banco.");
+			e.printStackTrace();
+
 			return false;
 		}
+
+		catch(ClassNotFoundException e) {
+			System.err.println("Driver JDBC não encontrado.");
+			e.printStackTrace();
+
+			return false;
+		}
+		
+		return true;
 	}
 
 	public boolean RemoverConta(int Codigo){
 		try {
-			// REMOVE OS DADOS DA CONTA COM BASE EM SEU CÓDIGO DE IDENTIFICAÇÂO
+			Class.forName("oracle.jdbc.driver.OracleDriver");
 
-			return true;
+			Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
+
+			PreparedStatement stmt = Conexao.prepareStatement("DELETE FROM RM93162.CONTA WHERE ID = ?");
+
+			stmt.setInt(1, Codigo);
 		}
-		catch(Exception e) {
+
+		catch(SQLException e) {
+			System.err.println("Não foi possível conectar ao banco.");
+			e.printStackTrace();
+
 			return false;
 		}
+
+		catch(ClassNotFoundException e) {
+			System.err.println("Driver JDBC não encontrado.");
+			e.printStackTrace();
+
+			return false;
+		}
+		
+		return true;
 	}
 	
 
@@ -82,30 +117,70 @@ public class Conta {
 			this.NomeConta = Conta.NomeConta;
 			this.SaldoConta = Conta.SaldoConta;
 			this.TipoConta = Conta.TipoConta;
-			this.Categoria = Conta.Categoria;
+			this.Codigo = Conta.Codigo;
 
-			// EDITA OS DADOS DA CONTA COM BASE NOS DADOS ENVIADOS COMO PARÂMETRO
+			Class.forName("oracle.jdbc.driver.OracleDriver");
 
-			return true;
+			Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
+
+			PreparedStatement stmt = Conexao.prepareStatement("UPDATE RM93162.CONTA SET NOME_CONTA = ?, SALDO_CONTA = ?, TIPO_CONTA = ? WHERE ID = ?");
+
+			stmt.setString(1, this.NomeConta);
+			stmt.setDouble(2, this.SaldoConta);
+			stmt.setString(3, this.TipoConta);
+			stmt.setInt(4, this.Codigo);
 		}
-		catch(Exception e) {
+
+		catch(SQLException e) {
+			System.err.println("Não foi possível conectar ao banco.");
+			e.printStackTrace();
+
 			return false;
 		}
+
+		catch(ClassNotFoundException e) {
+			System.err.println("Driver JDBC não encontrado.");
+			e.printStackTrace();
+
+			return false;
+		}
+		
+		return true;
 	}
-	
-	public Conta ConsultarCategoria(int Codigo){
-		Conta DadosConta = new Conta();
 
-		// CONSULTA OS DADOS DA CONTA COM BASE EM SEU CÓDIGO DE IDENTIFICAÇÂO
+	public Gasto ConsultarConta(int Codigo){
+		Gasto DadosGasto = new Gasto();
 
-		return DadosConta;
-	}
-	
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
 
-	public int CalcularFatura(int Codigo){
-		int Fatura = 0;
-		// CALCULA A CONTA COM BASE EM SEU CÓDIGO DE IDENTIFICAÇÂO
+			Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
 
-		return Fatura;
+			PreparedStatement stmt = Conexao.prepareStatement("SELECT * FROM RM93162.CONTA WHERE ID = ? ");
+			stmt.setInt(1, Codigo);
+			
+			ResultSet result = stmt.executeQuery();
+
+			while(result.next()) {
+				String NomeConta = result.getString("NOME_CONTA");
+				double SaldoConta = result.getDouble("SALDO_CONTA");
+				String TipoConta = result.getString("TIPO_CONTA");
+
+				System.out.println(NomeConta + " " + SaldoConta + " " + TipoConta );
+			}
+
+		}
+
+		catch(SQLException e) {
+			System.err.println("Não foi possível conectar ao banco.");
+			e.printStackTrace();
+		}
+
+		catch(ClassNotFoundException e) {
+			System.err.println("Driver JDBC não encontrado.");
+			e.printStackTrace();
+		}
+
+		return DadosGasto;
 	}
 }

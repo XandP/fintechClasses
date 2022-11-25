@@ -33,47 +33,18 @@ public class main {
 	public static void main(String[] args) {
 
 		
-		Usuario ObjUsuario = new Usuario();
-		Extrato ObjExtrato = new Extrato();
-
-		ObjUsuario.setCodigo(1);
-		ObjUsuario.setNome("Teste");
-		ObjUsuario.setSobrenome("da Silva");
-		ObjUsuario.setEmail("teste.silva@email.com");
-		ObjUsuario.setApelido("teste");
-		ObjUsuario.setDataNascimento(null);
-		ObjUsuario.setUltimoAcesso(null);
-		ObjUsuario.setPrimeiroAcesso(null); 
+		Login ObjLogin = new Login();
+		Pessoa ObjPessoa = new Pessoa();
 		
-		ObjExtrato.setCodigo(1);
-		ObjExtrato.setValor(1200);
-		ObjExtrato.setData(null);
-		ObjExtrato.setParcelas(1);
+		boolean teste = ObjLogin.RealizarLogin("ab","asd");
+		boolean teste2 = ObjLogin.RealizarLogin("ab","asd");
 
+		System.getProperty("java.version");
+		
+		System.out.println(System.getProperty("java.version"));
 		getAll(); 
 	}
 	
-	public static void insert() {
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-
-			Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
-
-			java.sql.Statement stmt = Conexao.createStatement();
-
-			stmt.executeUpdate("INSERT INTO RM93162.MOVIMENTACAO(FK_ID_CONTA, ENTRADA_SAIDA, VALOR, TIPO, NOTA, DATA) VALUES(19, 'E', 15.00, 'CREDITO', NULL, SYSDATE)");
-		}
-
-		catch(SQLException e) {
-			System.err.println("Não foi possível conectar ao banco.");
-			e.printStackTrace();
-		}
-
-		catch(ClassNotFoundException e) {
-			System.err.println("Driver JDBC não encontrado.");
-			e.printStackTrace();
-		}
-	}
 
 
 	public static void getAll() {

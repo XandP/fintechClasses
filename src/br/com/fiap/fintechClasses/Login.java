@@ -2,6 +2,8 @@ package br.com.fiap.fintechClasses;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Login {
@@ -23,45 +25,59 @@ public class Login {
 		return EmailLogin;
 	}
 
-	public void setSobrenome(String EmailLogin) {
+	public void setEmailLogin(String EmailLogin) {
 		this.EmailLogin = EmailLogin;
 	}
 
-	public String SenhaLogin() {
+	public String getSenhaLogin() {
 		return SenhaLogin;
 	}
 
-	public void SenhaLogin(String SenhaLogin) {
+	public void setSenhaLogin(String SenhaLogin) {
 		this.SenhaLogin = SenhaLogin;
 	}
 	
 	public boolean RealizarLogin(String EmailLogin, String SenhaLogin){
-		try {
+		int response = 0;
+		
 			try {
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 
 				Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
 
-				java.sql.Statement stmt = Conexao.createStatement();
 
-				stmt.executeUpdate("SELECT 1 FROM RM93162.LOGIN WHERE EMAIL = :email && SENHA = :senha ");
+				PreparedStatement stmt = Conexao.prepareStatement("SELECT 1 FROM RM93162.LOGIN WHERE EMAIL = ? AND SENHA = ? ");
+				stmt.setString(1, EmailLogin);
+				stmt.setString(2, SenhaLogin);
+				
+				ResultSet result = stmt.executeQuery();
+
+					while(result.next()) {
+						response = result.getInt(1);
+					}
+					
+					if(response == 1) {
+						return true;
+					}
+					
+					else {
+						return false;
+					}
+					
+
 			}
 
 			catch(SQLException e) {
 				System.err.println("Não foi possível conectar ao banco.");
 				e.printStackTrace();
+				return false;
 			}
 
 			catch(ClassNotFoundException e) {
 				System.err.println("Driver JDBC não encontrado.");
 				e.printStackTrace();
+				return false;
 			}
-
-			return true;
-		}
-		catch(Exception e) {
-			return false;
-		}
 	}
 
 	public boolean AdicionarLogin(String EmailLogin, String SenhaLogin){
@@ -72,9 +88,14 @@ public class Login {
 
 				Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
 
-				java.sql.Statement stmt = Conexao.createStatement();
 
-				stmt.executeUpdate("INSERT INTO RM93162.LOGIN(FK_ID_USUARIO, EMAIL, SENHA, DATA_REGISTRO) VALUES()");
+				PreparedStatement stmt = Conexao.prepareStatement("INSERT INTO RM93162.LOGIN(FK_ID_USUARIO, EMAIL, SENHA, DATA_REGISTRO) VALUES(?, ?, ?, SYSDATE)");
+
+				stmt.setInt(1, 1);
+				stmt.setString(2, EmailLogin);
+				stmt.setString(3, SenhaLogin);
+				
+				stmt.executeQuery();
 			}
 
 			catch(SQLException e) {
@@ -101,9 +122,10 @@ public class Login {
 
 				Connection Conexao = DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM93162", "270102");
 
-				java.sql.Statement stmt = Conexao.createStatement();
+				PreparedStatement stmt = Conexao.prepareStatement("DELETE FROM RM93162.LOGIN WHERE ID = ?");
 
-				stmt.executeUpdate("INSERT INTO RM93162.MOVIMENTACAO(FK_ID_CONTA, ENTRADA_SAIDA, VALOR, TIPO, NOTA, DATA) VALUES(19, 'E', 15.00, 'CREDITO', NULL, SYSDATE)");
+				stmt.setInt(1, Codigo);
+
 			}
 
 			catch(SQLException e) {
